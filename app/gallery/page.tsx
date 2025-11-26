@@ -3,19 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Photo as ApiPhoto } from "@/models/photo.model";
-import {
-  Button,
-  Card,
-  Empty,
-  Space,
-  Spin,
-  Typography,
-  message,
-} from "antd";
+import { Button, Card, Empty, Space, Spin, Typography, message } from "antd";
 import { ReloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { PhotoCard } from "@/components/PhotoCard";
+import { AuthBar } from "@/components/AuthBar";
 import { usePhotos } from "@/hooks/usePhotos";
 import { PHOTOS_ENDPOINT } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
 
 const { Title, Paragraph } = Typography;
 
@@ -28,6 +22,7 @@ export default function GalleryPage() {
   const [commentLoading, setCommentLoading] = useState<Record<string, boolean>>(
     {},
   );
+  const { user, loading: authLoading, loginWithGoogle } = useAuth();
 
   const resolvePhotoUrl = (photo: ApiPhoto) =>
     photo.url ?? photo.publicUrl ?? photo.storagePath ?? "";
@@ -44,11 +39,17 @@ export default function GalleryPage() {
     const content = commentInputs[key]?.trim();
     setCommentLoading((prev) => ({ ...prev, [key]: true }));
     try {
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      if (user) {
+        const token = await user.getIdToken();
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${PHOTOS_ENDPOINT}/${photoId}/comments`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({ body: content, text: content }),
       });
 
@@ -75,6 +76,7 @@ export default function GalleryPage() {
       {contextHolder}
       <div className="min-h-screen bg-[#f5f6fa] px-4 py-10">
         <div className="mx-auto flex max-w-6xl flex-col gap-6">
+          <AuthBar />
           <Card>
             <Space
               orientation="vertical"
@@ -100,11 +102,22 @@ export default function GalleryPage() {
                 >
                   Làm mới danh sách
                 </Button>
-                <Link href="/upload">
-                  <Button type="primary" icon={<UploadOutlined />}>
-                    Upload ảnh mới
+                {user ? (
+                  <Link href="/upload">
+                    <Button type="primary" icon={<UploadOutlined />}>
+                      Upload ảnh mới
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    type="primary"
+                    icon={<UploadOutlined />}
+                    onClick={loginWithGoogle}
+                    disabled={authLoading}
+                  >
+                    Đăng nhập để upload ảnh
                   </Button>
-                </Link>
+                )}
               </Space>
             </Space>
           </Card>
