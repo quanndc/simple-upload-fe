@@ -29,8 +29,6 @@ export default function GalleryPage() {
     {},
   );
 
-  const toKey = (id: ApiPhoto["id"]) => id.toString();
-
   const resolvePhotoUrl = (photo: ApiPhoto) =>
     photo.url ?? photo.publicUrl ?? photo.storagePath ?? "";
 
@@ -41,14 +39,9 @@ export default function GalleryPage() {
     });
   }, [fetchPhotos, messageApi]);
 
-  const handleCommentSubmit = async (photoId: ApiPhoto["id"]) => {
-    const key = toKey(photoId);
+  const handleCommentSubmit = async (photoId: number) => {
+    const key = photoId.toString();
     const content = commentInputs[key]?.trim();
-    if (!content) {
-      messageApi.warning("Vui lòng nhập nội dung bình luận");
-      return;
-    }
-
     setCommentLoading((prev) => ({ ...prev, [key]: true }));
     try {
       const response = await fetch(`${PHOTOS_ENDPOINT}/${photoId}/comments`, {
@@ -127,7 +120,7 @@ export default function GalleryPage() {
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
               {photos.map((photo) => {
-                const key = toKey(photo.id);
+                const key = photo.id.toString();
                 const photoUrl = resolvePhotoUrl(photo);
                 if (!photoUrl) {
                   return null;
@@ -145,7 +138,7 @@ export default function GalleryPage() {
                         [key]: value,
                       }))
                     }
-                    onSubmit={() => handleCommentSubmit(photo.id)}
+                    onSubmit={() => handleCommentSubmit(Number(photo.id))}
                   />
                 );
               })}

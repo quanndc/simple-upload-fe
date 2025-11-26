@@ -156,6 +156,7 @@ export function PhotoCard({
           onChange={(event) => onCommentChange(event.target.value)}
         />
         <Button
+          disabled={!commentValue?.trim()}
           type="primary"
           icon={<CommentOutlined />}
           loading={submitting}
