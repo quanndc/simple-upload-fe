@@ -1,4 +1,4 @@
-import { Comment } from "./comment.model";
+import { Comment, User } from "./comment.model";
 export interface Photo {
     id: string | number;
     url?: string;
@@ -8,5 +8,7 @@ export interface Photo {
     description?: string | null;
     originalName?: string | null;
     createdAt?: string;
+    user_firebase_id?: string;
+    User?: User;
     comments?: Comment[];
 }

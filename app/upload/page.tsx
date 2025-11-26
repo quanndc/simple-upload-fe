@@ -32,6 +32,7 @@ export default function UploadPage() {
     try {
       await uploadAll();
       messageApi.success("Đã upload ảnh thành công");
+      setDescription("");
     } catch (error) {
       const err = error as Error;
       messageApi.error(err.message || "Không thể upload ảnh");
@@ -86,7 +87,7 @@ export default function UploadPage() {
                   type="primary"
                   icon={<CheckCircleOutlined />}
                   loading={isUploading}
-                  disabled={isUploading || fileList.length === 0}
+                  disabled={isUploading || fileList.length === 0 || description.trim().length === 0}
                   onClick={handleConfirmUpload}
                 >
                   Xác nhận upload

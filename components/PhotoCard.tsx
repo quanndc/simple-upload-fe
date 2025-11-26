@@ -9,7 +9,6 @@ import {
   Input,
   Modal,
   Space,
-  Tag,
   Typography,
 } from "antd";
 import { CommentOutlined } from "@ant-design/icons";
@@ -21,7 +20,7 @@ const resolveCommentAuthor = (comment?: Comment) => {
   if (!comment) {
     return "Ẩn danh";
   }
-  return (comment as { author?: string | null }).author ?? "Ẩn danh";
+  return comment.User?.name ?? "Ẩn danh";
 };
 
 type PhotoCardProps = {
@@ -117,6 +116,11 @@ export function PhotoCard({
           <Title level={4} className="mb-0!">
             {photo.description ?? "Ảnh không tiêu đề"}
           </Title>
+          {photo.User?.name && (
+            <Text type="secondary" className="text-sm">
+              Đăng bởi: {photo.User.name}
+            </Text>
+          )}
           {photo.createdAt && (
             <Text type="secondary" className="text-xs">
               Tạo lúc {new Date(photo.createdAt).toLocaleString()}
@@ -161,7 +165,11 @@ export function PhotoCard({
                         <Text>{comment.body}</Text>
                         {comment.createdAt && (
                           <Text type="secondary" className="text-xs">
-                            {new Date(comment.createdAt).toLocaleString()}
+                            {new Date(
+                              typeof comment.createdAt === "string"
+                                ? comment.createdAt
+                                : comment.createdAt,
+                            ).toLocaleString()}
                           </Text>
                         )}
                       </Space>
