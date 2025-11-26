@@ -118,7 +118,7 @@ export default function GalleryPage() {
               <Empty description="Chưa có ảnh nào. Hãy upload ảnh mới!" />
             </Card>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
               {photos.map((photo) => {
                 const key = photo.id.toString();
                 const photoUrl = resolvePhotoUrl(photo);
