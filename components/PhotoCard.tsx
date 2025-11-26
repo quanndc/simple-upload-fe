@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import type { Photo } from "../models/photo.model";
 import {
+  Alert,
   Button,
   Card,
   Input,
@@ -13,6 +14,7 @@ import {
 } from "antd";
 import { CommentOutlined } from "@ant-design/icons";
 import { Comment } from "../models/comment.model";
+import { useAuth } from "./AuthProvider";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -40,6 +42,7 @@ export function PhotoCard({
   onSubmit,
   submitting = false,
 }: PhotoCardProps) {
+  const { user, loginWithGoogle } = useAuth();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [visibleComments, setVisibleComments] = useState(5);
@@ -193,23 +196,36 @@ export function PhotoCard({
             </>
           )}
 
-          <Space orientation="vertical" size="small" className="w-full">
-            <Input.TextArea
-              rows={3}
-              placeholder="Nhập bình luận của bạn..."
-              value={commentValue}
-              onChange={(event) => onCommentChange(event.target.value)}
+          {!user ? (
+            <Alert
+              message="Bạn cần đăng nhập để bình luận"
+              type="info"
+              showIcon
+              action={
+                <Button size="small" type="primary" onClick={loginWithGoogle}>
+                  Đăng nhập
+                </Button>
+              }
             />
-            <Button
-              disabled={!commentValue?.trim()}
-              type="primary"
-              icon={<CommentOutlined />}
-              loading={submitting}
-              onClick={onSubmit}
-            >
-              Gửi bình luận
-            </Button>
-          </Space>
+          ) : (
+            <Space orientation="vertical" size="small" className="w-full">
+              <Input.TextArea
+                rows={3}
+                placeholder="Nhập bình luận của bạn..."
+                value={commentValue}
+                onChange={(event) => onCommentChange(event.target.value)}
+              />
+              <Button
+                disabled={!commentValue?.trim()}
+                type="primary"
+                icon={<CommentOutlined />}
+                loading={submitting}
+                onClick={onSubmit}
+              >
+                Gửi bình luận
+              </Button>
+            </Space>
+          )}
         </>
       )}
     </Card>
